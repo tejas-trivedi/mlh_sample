@@ -22,92 +22,6 @@ import uuid
 from acm.settings import FIREBASE_API_KEY, MERCHANT_ID, MERCHANT_KEY
 
 
-class UpcomingEventsView(views.APIView):
-    permission_classes = [AllowAny]
-
-    def get(self, request, format=None):
-        now = str(datetime.date.today())
-        data = db.reference('acm_app_events/')
-        events = data.get()
-        event_names = []
-        for key in events.keys():
-            temp = key
-            event_names.append(temp)
-        upcoming_events = []
-        sort_upcoming = dict()
-        for i in events:
-            if (events[i]['date'] > now):
-                upcoming_events.append(events[i])
-        upcoming_events.sort(key = lambda x:x['date'],reverse=True)
-        x=0
-        for i in upcoming_events:
-            response_data = {
-                upcoming_events[x]["event_name"]: i
-            }
-            sort_upcoming.update(response_data)
-            x = x+1
-        return Response(sort_upcoming)
-
-
-class OngoingEventsView(generics.ListAPIView):
-    permission_classes = [AllowAny]
-
-    def get(self, request, format=None):
-        now = str(datetime.date.today())
-        data = db.reference('acm_app_events/')
-        events = data.get()
-
-        event_names = []
-        for key in events.keys():
-            temp = key
-            event_names.append(temp)
-
-        ongoing_events = dict()
-
-        for i in events:
-            if (events[i]['date'] == now):
-                ongoing_events[i] = events[i]
-
-        return Response(ongoing_events)
-
-
-class PastEventsView(generics.ListAPIView):
-    permission_classes = [AllowAny]
-
-    def get(self, request, format=None):
-        now = str(datetime.date.today())
-        data = db.reference('acm_app_events/')
-        events = data.get()
-        event_names = []
-        for key in events.keys():
-            temp = key
-            event_names.append(temp)
-        past_events = []
-        sort_past = dict()
-        for i in events:
-            if (events[i]['date'] < now):
-                past_events.append(events[i])
-        past_events.sort(key = lambda x:x['date'],reverse=True)
-        x=0
-        for i in past_events:
-            response_data = {
-                past_events[x]["event_name"]: i
-            }
-            sort_past.update(response_data)
-            x = x+1
-        return Response(sort_past)
-
-
-class EventInfo(views.APIView):
-    permission_classes = [AllowAny]
-
-    def get(self, request, event_name, format=None):
-        data = requests.get(
-            'https://acm-acmw-app-6aa17.firebaseio.com/acm_app_events/%s.json' % event_name
-        )
-        data = data.json()
-        return Response(data)
-
 
 class EventRegister(APIView):
     permission_classes = [AllowAny]
@@ -115,9 +29,9 @@ class EventRegister(APIView):
     def post(self, request, format=None):
         if firebase_admin._DEFAULT_APP_NAME not in firebase_admin._apps:
             cred = credentials.Certificate(
-                'acm-acmw-app-6aa17-firebase-adminsdk-51axm-b63d0fd86e.json')
+                'db.json')
             check = firebase_admin.initialize_app(cred, {
-                'databaseURL': 'https://acm-acmw-app-6aa17.firebaseio.com'
+                'databaseURL': 'https://url.com'
             })
         uid = request.data.get("uid")
         sap = request.data.get("sap")
@@ -210,9 +124,9 @@ class EventView(APIView):
         response_data = "Hello"
         if firebase_admin._DEFAULT_APP_NAME not in firebase_admin._apps:
             cred = credentials.Certificate(
-                'acm-acmw-app-6aa17-firebase-adminsdk-51axm-b63d0fd86e.json')
+                'db.json')
             check = firebase_admin.initialize_app(cred, {
-                'databaseURL': 'https://acm-acmw-app-6aa17.firebaseio.com/'
+                'databaseURL': 'https://url.com/'
             })
         # request the data
         uid = request.data.get("uid")
@@ -281,7 +195,7 @@ class EventView(APIView):
                 return Response(user_detail, status=status.HTTP_200_OK)
             # this means he has already registered for the event so return already registered and the event details
             response_data = {
-                "event_registred": True,
+                "event_registered": True,
                 "event_date": event_detail.get()["date"],
                 "event_name": event_detail.get()["event_name"],
                 "amount": amount
@@ -291,6 +205,6 @@ class EventView(APIView):
         # this means that he is a anonymous user and the front has tp render the form for the user to post that details in next view
         anonymous = {
             "amount": amount,
-            "Anonynous": True
+            "Anonymous": True
         }
         return Response(anonymous, status=status.HTTP_200_OK)

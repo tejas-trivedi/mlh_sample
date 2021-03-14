@@ -100,7 +100,7 @@ class UserLogoutView(APIView):
         IsAuthenticated,
     ]
 
-    def post(Self, request, format=None):
+    def post(self, request, format=None):
         if request.user.auth_token.delete():
             return Response({"message": ["User logged out"]}, status=status.HTTP_200_OK)
         else:
@@ -111,16 +111,7 @@ class UserLogoutView(APIView):
 
 
 class ACMMemberRegisterView(APIView):
-    """
-    testing it on postman
-    url : http://127.0.0.1:8000/accounts/registration/
-    body contains 'name', 'branch', 'year',  'dob', 'contact_number',
-                  'whatsapp_number', 'sap_id', 'hostel_pg', 'membership_type' these fields as mandat
-    headers: Authorization token
-    results to check in admin
-    acm member registered
-    then check the role of user in user model, its changed to acm member now :)
-    """
+
     permission_classes = [IsAuthenticated, ]
 
     def post(self, request, *args, **kwargs):
@@ -242,8 +233,8 @@ class GuestView(CreateAPIView):
             confirm_url = 'http://localhost:8000/accounts/pass/{}/{}/'.format(
                 guest_id, token)
             print(confirm_url)
-            send_mail('Welcome to UPES ACM', 'This is a verification mail sent. Please click on the link below: {}'.format(
-                confirm_url), 'tejas99trivedi@gmail.com', [guest_email])
+            send_mail('Welcome', 'This is a verification mail sent. Please click on the link below: {}'.format(
+                confirm_url), 'test@gmail.com', [guest_email])
             return Response(responseData, status=status.HTTP_200_OK)
         guest_name = request.data.get('guest_name')
         guestlog = GuestUser.objects.create(
@@ -257,8 +248,8 @@ class GuestView(CreateAPIView):
         confirm_url = 'http://localhost:8000/accounts/pass/{}/{}/'.format(
             guest_id, token)
         print(confirm_url)
-        send_mail('Welcome to UPES ACM', 'This is a verification mail sent. Please click on the link below: {}'.format(
-            confirm_url), 'tejas99trivedi@gmail.com', [guest_email])
+        send_mail('Welcome', 'This is a verification mail sent. Please click on the link below: {}'.format(
+            confirm_url), 'test@gmail.com', [guest_email])
         return Response(responseData, status=status.HTTP_201_CREATED)
 
 
